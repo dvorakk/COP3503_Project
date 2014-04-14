@@ -172,7 +172,7 @@ bool Shunting::convertInput(const vector<string>& input, const int& size, vector
 //Has to return a number because of the ans keyword
 //Calls parseTokens, then convertInput, then behaves like RPNtoDouble
 //Does this so the main isn't  cluttered like the one we saw
-Number* Shunting:: evaluate(string input)
+Number* Shunting:: evaluate(string input, Number* ans)
 {
 
 	Operations* o = new Operations();
@@ -216,14 +216,41 @@ Number* Shunting:: evaluate(string input)
 
 					//Get the result
 					if(converted[i] == "+") {
-						result = o->add(n1, n2);
+						if(n1->getValue() != 0 && n2->getValue() != 0)
+							result = o->add(n1, n2);
+						else if(n1->getValue() == 0)
+							result = n2;
+						else
+							result = n1;
 					}
-					else if(converted[i] == "-")
-						result = o->subtract(n1, n2);
-					else if(converted[i] == "*")
-						result = o->multiply(n1, n2);
+					else if(converted[i] == "-"){
+						if(n1->getValue() != 0 && n2->getValue() != 0)
+							result = o->subtract(n1, n2);
+						else
+							result = n1;
+					}
+					else if(converted[i] == "*") {
+						if(n1->getValue() != 1 && n2->getValue() != 1)
+							result = o->multiply(n1, n2);
+						else if(n1->getValue() == 1)
+							result = n2;
+						else
+							result = n1;
+					}
+
 					else if(converted[i] == "/")
-						result = o->divide(n1, n2);
+					{
+						if(n2->getValue() != 0 && n2->getValue() != 1)
+							result = o->divide(n1, n2);
+						else if(n2->getValue() == 0)
+						{
+							cout << "Cannot divide by zero" << endl;
+							result = new Rational(0);
+						}
+						else
+							result = n1;
+
+					}
 					else if(converted[i] == "^")
 						result = o->exponentiate(n1, n2);
 					else
